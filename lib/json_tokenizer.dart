@@ -3,12 +3,14 @@ library json_tokenizer;
 
 import "dart:collection";
 
+part "json_parser.dart";
+
 RegExp STRING = new RegExp(r'^"$');
 RegExp WHITESPACE = new RegExp(r"^\s$");
 
 List numberCharacters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "e", "E", "."];
 
-Map<String, String> tokenMap = {
+Map<String, String> valueTypeMap = {
   "0": "number",
   "1": "number",
   "2": "number",
@@ -30,6 +32,30 @@ Map<String, String> tokenMap = {
   ",": "value-separator",
   ":": "name-separator",
   '"': "string"
+};
+
+Map<String, String> tokenTypeMap = {
+  "0": "value",
+  "1": "value",
+  "2": "value",
+  "3": "value",
+  "4": "value",
+  "5": "value",
+  "6": "value",
+  "7": "value",
+  "8": "value",
+  "9": "value",
+  "-": "value",
+  "t": "value",
+  "f": "value",
+  "{": "begin-object",
+  "}": "end-object",
+  "[": "begin-array",
+  "]": "end-array",
+  "n": "value",
+  ",": "value-separator",
+  ":": "name-separator",
+  '"': "value"
 };
 
 class JsonTokenizer {
@@ -60,13 +86,11 @@ class JsonTokenizer {
       }
 
       String value;
-      var type = tokenMap[character];
-      switch (type) {
+      var valueType = valueTypeMap[character];
+      var tokenType = tokenTypeMap[character];
+      switch (valueType) {
         case "number":
           value = parseNumber();
-          break;
-        case "string":
-          value = parseString();
           break;
         case "bool":
           value = parseBool();
@@ -91,8 +115,9 @@ class JsonTokenizer {
       }
 
       Token token = new Token();
-      token.type = type;
+      token.valueType = valueType;
       token.value = value;
+      token.type = tokenType;
       tokens.add(token);
     }
     return tokens;
@@ -156,6 +181,7 @@ class JsonTokenizer {
 
 
 class Token {
-  String type;
+  String valueType;
   String value;
+  String type;
 }
