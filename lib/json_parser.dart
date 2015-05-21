@@ -49,9 +49,6 @@ class JsonValidator {
             case "end-object":
               state = "exited-object";
               break;
-//            case "begin-array":
-//              state = "in-array";
-//              break;
             case "value":
               //TODO only allow strings
               state = "object-key";
@@ -73,6 +70,12 @@ class JsonValidator {
           switch(token.type) {
             case "value":
               state = "object-value";
+              break;
+            case "begin-array":
+              state = "entered-array";
+              break;
+            case "begin-object":
+              state = "entered-object";
               break;
             default:
               throwError(token);
@@ -106,6 +109,9 @@ class JsonValidator {
             case "value":
               state = "array-value";
               break;
+            case "begin-object":
+              state = "entered-object";
+              break;
             default:
               throwError(token);
           }
@@ -126,6 +132,9 @@ class JsonValidator {
             case "value":
               state = "array-value";
               break;
+            case "begin-object":
+              state = "entered-object";
+              break;
             default:
               throwError(token);
           }
@@ -134,6 +143,15 @@ class JsonValidator {
           switch(token.type) {
             case "eof":
               return true;
+            case "end-array":
+              return true;
+              break;
+            case "value-separator":
+              state = "array-value-separator";
+              break;
+            case "end-object":
+              state = "exited-object";
+              break;
             default:
               throwError(token);
           }
