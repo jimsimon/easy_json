@@ -86,6 +86,11 @@ main() {
       expect(validator.isValid(), isTrue);
     });
 
+    test("handles arrays within arrays", () {
+      JsonValidator validator = new JsonValidator('[[],[]]');
+      expect(validator.isValid(), isTrue);
+    });
+
     test("handles objects with property value of empty array", () {
       JsonValidator validator = new JsonValidator('{"array":[]}');
       expect(validator.isValid(), isTrue);
@@ -118,6 +123,46 @@ main() {
   });
 
   group("negative tests", (){
+    group("does not allow mismatching braces and brackets", (){
+      test("bracket then brace", (){
+        JsonValidator validator = new JsonValidator('[}');
+        expect(() => validator.isValid(), throwsArgumentError);
+      });
 
+      test("brace then bracket", (){
+        JsonValidator validator = new JsonValidator('{]');
+        expect(() => validator.isValid(), throwsArgumentError);
+      });
+
+      test("valid braces extra bracket at front", (){
+        JsonValidator validator = new JsonValidator('[{}');
+        expect(() => validator.isValid(), throwsArgumentError);
+      });
+
+      test("valid braces extra bracket at end", (){
+        JsonValidator validator = new JsonValidator('{}]');
+        expect(() => validator.isValid(), throwsArgumentError);
+      });
+    });
+
+    test("does not allow comma after array", (){
+      JsonValidator validator = new JsonValidator('[],');
+      expect(() => validator.isValid(), throwsArgumentError);
+    });
+
+    test("does not allow comma after object", (){
+      JsonValidator validator = new JsonValidator('{},');
+      expect(() => validator.isValid(), throwsArgumentError);
+    });
+
+    test("does not allow a comma after value", (){
+      JsonValidator validator = new JsonValidator('"hello",');
+      expect(() => validator.isValid(), throwsArgumentError);
+    });
+
+    test("does not allow only a comma", (){
+      JsonValidator validator = new JsonValidator(',');
+      expect(() => validator.isValid(), throwsArgumentError);
+    });
   });
 }
