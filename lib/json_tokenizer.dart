@@ -3,7 +3,8 @@ library json_tokenizer;
 
 import "dart:collection";
 
-part "json_parser.dart";
+part "json_validator.dart";
+part "json_validator2.dart";
 
 RegExp STRING = new RegExp(r'^"$');
 RegExp WHITESPACE = new RegExp(r"^\s$");
@@ -120,6 +121,7 @@ class JsonTokenizer {
       token.type = tokenType;
       tokens.add(token);
     }
+    tokens.add(new Token()..type="eof");
     return tokens;
   }
 
