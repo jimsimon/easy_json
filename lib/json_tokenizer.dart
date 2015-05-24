@@ -3,9 +3,6 @@ library json_tokenizer;
 
 import "dart:collection";
 
-part "json_validator.dart";
-part "json_validator2.dart";
-
 RegExp STRING = new RegExp(r'^"$');
 RegExp WHITESPACE = new RegExp(r"^\s$");
 
@@ -63,18 +60,18 @@ class JsonTokenizer {
 
   int _index = 0;
   String _json;
-  Queue<Token> _tokens;
+  Queue<Token> tokens;
 
   JsonTokenizer(String this._json) {
-    _tokens = _tokenize();
+    tokens = _tokenize();
   }
 
   Token nextToken() {
-    if (_tokens.isEmpty) {
+    if (tokens.isEmpty) {
       return null;
     }
 
-    return _tokens.removeFirst();
+    return tokens.removeFirst();
   }
 
   Queue<Token> _tokenize() {

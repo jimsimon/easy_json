@@ -1,11 +1,14 @@
-part of json_tokenizer;
+library v1;
+
+import "dart:collection";
+import "package:json_tokenizer/json_tokenizer.dart";
 
 class JsonValidator {
 
   isValid(String json) {
     String _state = "init";
     Queue<String> _stack = new Queue();
-    Queue<Token> _tokens = new JsonTokenizer(json)._tokens;
+    Queue<Token> _tokens = new JsonTokenizer(json).tokens;
 
     while (_tokens.isNotEmpty) {
       Token token = _tokens.removeFirst();

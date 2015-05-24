@@ -1,28 +1,28 @@
-import "package:json_tokenizer/json_tokenizer.dart";
+import "package:json_tokenizer/json_validator.dart" as t;
+import "package:json_tokenizer/json_validator2.dart" as t2;
+import "package:json_tokenizer/json_validator3.dart" as t3;
+import "package:json_tokenizer/json_validator4.dart" as t4;
 
-b2() {
-  DateTime start = new DateTime.now();
-  JsonValidator2 validator2 = new JsonValidator2();
-  for (int i = 0; i < 10000; i++) {
-    benchmark(validator2);
-  }
-  DateTime end = new DateTime.now();
-  print("JsonValidator2 Time: ${end.difference(start).inMilliseconds}");
+runSuite(iterationCount) {
+  runBenchmark("JsonValidator1", new t.JsonValidator(), iterationCount);
+  runBenchmark("JsonValidator2", new t2.JsonValidator(), iterationCount);
+  runBenchmark("JsonValidator3", new t3.JsonValidator(), iterationCount);
+  runBenchmark("JsonValidator4", new t4.JsonValidator(), iterationCount);
 }
 
-B1() {
+runBenchmark(name, validator, iterationCount) {
   DateTime start = new DateTime.now();
-  JsonValidator validator = new JsonValidator();
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < iterationCount; i++) {
     benchmark(validator);
   }
   DateTime end = new DateTime.now();
-  print("JsonValidator Time: ${end.difference(start).inMilliseconds}");
+  print("$name Time ($iterationCount iterations): ${end.difference(start).inMilliseconds}");
 }
 
 main() {
-  B1();
-  b2();
+  runSuite(10);
+  runSuite(10000);
+  runSuite(100000);
 }
 
 benchmark(validator) {

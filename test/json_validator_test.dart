@@ -3,11 +3,12 @@ library json_parser.test;
 import 'package:test/test.dart';
 
 import 'package:json_tokenizer/json_tokenizer.dart';
+import "package:json_tokenizer/json_validator4.dart";
 
 main() async {
-  JsonValidator validator;
+  var validator;
   setUp((){
-    validator = new JsonValidator2();
+    validator = new JsonValidator();
   });
 
   group("positive tests", () {

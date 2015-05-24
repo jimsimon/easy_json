@@ -1,12 +1,14 @@
-part of json_tokenizer;
+library v2;
 
+import "package:json_tokenizer/json_tokenizer.dart";
+import "dart:collection";
 
 Queue<Responsibility> requiredStack;
-class JsonValidator2 implements JsonValidator {
+class JsonValidator {
 
   isValid(String json) {
     requiredStack = new Queue();
-    Queue<Token> _tokens = new JsonTokenizer(json)._tokens;
+    Queue<Token> _tokens = new JsonTokenizer(json).tokens;
 
     requiredStack.addFirst(new ErrorResponsibility(true));
     requiredStack.addFirst(new EndOfInputResponsibility(true));
@@ -34,10 +36,6 @@ class JsonValidator2 implements JsonValidator {
     }
     return true;
   }
-
-  String _state;
-
-  Queue<String> _stack;
 }
 
 abstract class Responsibility {
