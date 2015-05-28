@@ -4,6 +4,7 @@ import "package:json_tokenizer/json_tokenizer.dart";
 import "dart:collection";
 
 Queue<Responsibility> requiredStack;
+
 class JsonValidator {
 
   isValid(String json) {

@@ -3,7 +3,7 @@ library json_parser.test;
 import 'package:test/test.dart';
 
 import 'package:json_tokenizer/json_tokenizer.dart';
-import "package:json_tokenizer/json_validator4.dart";
+import "package:json_tokenizer/json_validator5.dart";
 
 main() async {
   var validator;

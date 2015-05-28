@@ -1,12 +1,27 @@
-library v1;
+library v6;
 
 import "dart:collection";
 import "package:json_tokenizer/json_tokenizer.dart";
 
+
 class JsonValidator {
 
+  static const int INIT = 0;
+  static const int TOP_LEVEL_VALUE = 1;
+  static const int ENTERED_OBJECT = 2;
+  static const int ENTERED_ARRAY = 3;
+  static const int OBJECT_VALUE = 4;
+  static const int OBJECT_VALUE_SEPARATOR = 5;
+  static const int OBJECT_NAME_SEPARATOR = 6;
+  static const int OBJECT_KEY = 7;
+  static const int ARRAY_VALUE = 8;
+  static const int ARRAY_VALUE_SEPARATOR = 9;
+  static const int EXITED_OBJECT = 10;
+  static const int EXITED_ARRAY = 11;
+  static const int EOF = 12;
+
   isValid(String json) {
-    String _state = "init";
+    int _state = INIT;
     Queue<String> _stack = new Queue();
     Queue<Token> _tokens = new JsonTokenizer(json).tokens;
 
@@ -17,188 +32,188 @@ class JsonValidator {
         throwError(token);
       }
 
-      switch(_state) {
-        case "init":
-          switch(token.type) {
+      switch (_state) {
+        case INIT:
+          switch (token.type) {
             case "begin-object":
               _stack.addFirst(token.type);
-              _state = "entered-object";
+              _state = ENTERED_OBJECT;
               break;
             case "begin-array":
               _stack.addFirst(token.type);
-              _state = "entered-array";
+              _state = ENTERED_ARRAY;
               break;
             case "value":
-              _state = "top-level-value";
+              _state = TOP_LEVEL_VALUE;
               break;
             default:
               throwError(token);
           }
           break;
-        case "top-level-value":
-          switch(token.type) {
+        case TOP_LEVEL_VALUE:
+          switch (token.type) {
             case "eof":
-              _state = "eof";
+              _state = EOF;
               break;
             default:
               throwError(token);
           }
           break;
-        case "entered-object":
-          switch(token.type) {
+        case ENTERED_OBJECT:
+          switch (token.type) {
             case "end-object":
               _stack.removeFirst();
-              _state = "exited-object";
+              _state = EXITED_OBJECT;
               break;
             case "value":
-              //TODO only allow strings
-              _state = "object-key";
+            //TODO only allow strings
+              _state = OBJECT_KEY;
               break;
             default:
               throwError(token);
           }
           break;
-        case "object-key":
-          switch(token.type) {
+        case OBJECT_KEY:
+          switch (token.type) {
             case "name-separator":
-              _state = "object-name-separator";
+              _state = OBJECT_NAME_SEPARATOR;
               break;
             default:
               throwError(token);
           }
           break;
-        case "object-name-separator":
-          switch(token.type) {
+        case OBJECT_NAME_SEPARATOR:
+          switch (token.type) {
             case "value":
-              _state = "object-value";
+              _state = OBJECT_VALUE;
               break;
             case "begin-array":
               _stack.addFirst(token.type);
-              _state = "entered-array";
+              _state = ENTERED_ARRAY;
               break;
             case "begin-object":
               _stack.addFirst(token.type);
-              _state = "entered-object";
+              _state = ENTERED_OBJECT;
               break;
             default:
               throwError(token);
           }
           break;
-        case "object-value":
-          switch(token.type) {
+        case OBJECT_VALUE:
+          switch (token.type) {
             case "end-object":
               _stack.removeFirst();
-              _state = "exited-object";
+              _state = EXITED_OBJECT;
               break;
             case "value-separator":
-              _state = "object-value-separator";
+              _state = OBJECT_VALUE_SEPARATOR;
               break;
             default:
               throwError(token);
           }
           break;
-        case "object-value-separator":
-          switch(token.type) {
+        case OBJECT_VALUE_SEPARATOR:
+          switch (token.type) {
             case "value":
-              _state = "object-key";
+              _state = OBJECT_KEY;
               break;
             default:
               throwError(token);
           }
           break;
-        case "entered-array":
-          switch(token.type) {
+        case ENTERED_ARRAY:
+          switch (token.type) {
             case "begin-array":
               _stack.addFirst(token.type);
-              _state = "entered-array";
+              _state = ENTERED_ARRAY;
               break;
             case "end-array":
               _stack.removeFirst();
-              _state = "exited-array";
+              _state = EXITED_ARRAY;
               break;
             case "value":
-              _state = "array-value";
+              _state = ARRAY_VALUE;
               break;
             case "begin-object":
               _stack.addFirst(token.type);
-              _state = "entered-object";
+              _state = ENTERED_OBJECT;
               break;
             default:
               throwError(token);
           }
           break;
-        case "array-value":
-          switch(token.type) {
+        case ARRAY_VALUE:
+          switch (token.type) {
             case "end-array":
               _stack.removeFirst();
-              _state = "exited-array";
+              _state = EXITED_ARRAY;
               break;
             case "value-separator":
-              _state = "array-value-separator";
+              _state = ARRAY_VALUE_SEPARATOR;
               break;
             default:
               throwError(token);
           }
           break;
-        case "array-value-separator":
-          switch(token.type) {
+        case ARRAY_VALUE_SEPARATOR:
+          switch (token.type) {
             case "value":
-              _state = "array-value";
+              _state = ARRAY_VALUE;
               break;
             case "begin-object":
               _stack.addFirst(token.type);
-              _state = "entered-object";
+              _state = ENTERED_OBJECT;
               break;
             case "begin-array":
               _stack.addFirst(token.type);
-              _state = "entered-array";
+              _state = ENTERED_ARRAY;
               break;
             default:
               throwError(token);
           }
           break;
-        case "exited-object":
-          switch(token.type) {
+        case EXITED_OBJECT:
+          switch (token.type) {
             case "eof":
-              _state = "eof";
+              _state = EOF;
               break;
             case "end-array":
               if (_stack.isEmpty) {
                 throwError(token);
               }
               _stack.removeFirst();
-              _state = "exited-array";
+              _state = EXITED_ARRAY;
               break;
             case "value-separator":
-              _state = "array-value-separator";
+              _state = ARRAY_VALUE_SEPARATOR;
               break;
             case "end-object":
               _stack.removeFirst();
-              _state = "exited-object";
+              _state = EXITED_OBJECT;
               break;
             default:
               throwError(token);
           }
           break;
-        case "exited-array":
-          switch(token.type) {
+        case EXITED_ARRAY:
+          switch (token.type) {
             case "eof":
-              _state = "eof";
+              _state = EOF;
               break;
             case "end-array":
               _stack.removeFirst();
-              _state = "exited-array";
+              _state = EXITED_ARRAY;
               break;
             case "value-separator":
               if (_stack.first == "begin-array") {
-                _state = "array-value-separator";
-              } else if (_stack.first == "begin-object"){
-                _state = "object-value-separator";
+                _state = ARRAY_VALUE_SEPARATOR;
+              } else if (_stack.first == "begin-object") {
+                _state = OBJECT_VALUE_SEPARATOR;
               }
               break;
             case "end-object":
               _stack.removeFirst();
-              _state = "exited-object";
+              _state = EXITED_OBJECT;
               break;
             default:
               throwError(token);
@@ -208,7 +223,7 @@ class JsonValidator {
           throwError(token);
           break;
       }
-      if (_state == "eof") {
+      if (_state == EOF) {
         if (_stack.isNotEmpty) {
           throwError(token);
         }
