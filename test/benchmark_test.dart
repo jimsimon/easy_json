@@ -1,20 +1,8 @@
-import "package:json_tokenizer/json_validator.dart" as t;
-import "package:json_tokenizer/json_validator2.dart" as t2;
-import "package:json_tokenizer/json_validator3.dart" as t3;
-import "package:json_tokenizer/json_validator4.dart" as t4;
-import "package:json_tokenizer/json_validator5.dart" as t5;
-import "package:json_tokenizer/json_validator6.dart" as t6;
+import "package:json_tokenizer/json_validator.dart";
 
 runSuite(iterationCount) {
-//  runBenchmark("JsonValidator1", new t.JsonValidator(), iterationCount);
-//  runBenchmark("JsonValidator2", new t2.JsonValidator(), iterationCount);
-//  runBenchmark("JsonValidator3", new t3.JsonValidator(), iterationCount);
-//  runBenchmark("JsonValidator4", new t4.JsonValidator(), iterationCount);
   for (int i = 0; i < 5; i++) {
-    runBenchmark("JsonValidator6", new t6.JsonValidator(), iterationCount);
-  }
-  for (int i = 0; i < 5; i++) {
-    runBenchmark("JsonValidator5", new t5.JsonValidator(), iterationCount);
+    runBenchmark("JsonValidator5", new JsonValidator(), iterationCount);
   }
 }
 
@@ -28,10 +16,10 @@ runBenchmark(name, validator, iterationCount) {
 }
 
 main() {
-//  runSuite(10);
+  runSuite(10);
   runSuite(100);
-//  runSuite(10000);
-//  runSuite(100000);
+  runSuite(10000);
+  runSuite(100000);
 }
 
 benchmark(validator) {
