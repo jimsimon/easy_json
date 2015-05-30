@@ -2,6 +2,18 @@
 library json_tokenizer;
 
 import "dart:collection";
+import "dart:convert";
+
+//@MirrorsUsed(targets: const [int, double, bool, String])
+import "dart:mirrors";
+
+part "json_parser.dart";
+part "src/int_codec.dart";
+part "src/double_codec.dart";
+part "src/bool_codec.dart";
+part "src/string_codec.dart";
+part "src/default_codec.dart";
+part "src/list_codec.dart";
 
 RegExp STRING = new RegExp(r'^"$');
 RegExp WHITESPACE = new RegExp(r"^\s$");
