@@ -95,24 +95,31 @@ main() async {
       expect(result[1].hello, "goodbye");
     });
 
-    test("handles arrays with mixed elements", () {
-      expect(parser.parse('[{"hello":"world"},123,"goodbye",true]'), isTrue);
-    });
+//    test("handles arrays with mixed elements", () {
+//      expect(parser.parse('[{"hello":"world"},123,"goodbye",true]'), isTrue);
+//    });
 
     test("handles arrays within arrays", () {
-      expect(parser.parse('[[],[]]'), isTrue);
+      Type type = new TypeToken<List<List<String>>>().type;
+      expect(parser.parse('[[],[]]', type), [[],[]]);
     });
 
     test("handles objects with property value of empty array", () {
-      expect(parser.parse('{"array":[]}'), isTrue);
+      var result = parser.parse('{"array":[]}', NestedListFixture);
+      expect(result, new isInstanceOf<NestedListFixture>());
+      expect(result.array, isEmpty);
     });
 
     test("handles objects with property value of array with single item", () {
-      expect(parser.parse('{"array":["hello"]}'), isTrue);
+      var result = parser.parse('{"array":["hello"]}', NestedListFixture);
+      expect(result, new isInstanceOf<NestedListFixture>());
+      expect(result.array, ["hello"]);
     });
 
     test("handles objects with property value of array with multiple items", () {
-      expect(parser.parse('{"array":["hello","world"]}'), isTrue);
+      var result = parser.parse('{"array":["hello","world"]}', NestedListFixture);
+      expect(result, new isInstanceOf<NestedListFixture>());
+      expect(result.array, ["hello", "world"]);
     });
 
     test("handles objects with property value of array with multiple mixed items", () {
@@ -169,4 +176,8 @@ class Fixture {
   String hello;
   String world;
   String cool;
+}
+
+class NestedListFixture {
+  List<String> array;
 }

@@ -6,7 +6,6 @@ enum STATE {
   IN_OBJECT,
   IN_ARRAY,
   FINISHED_OBJECT_ENTRY,
-  FINISHED_ARRAY_ENTRY,
   EOF
 }
 
@@ -32,28 +31,30 @@ class JsonParser {
   }
 
   parse(String json, Type t) {
-    TypeMirror typeMirror = reflectType(t);
-    STATE _state = STATE.INIT;
+    STATE state = STATE.INIT;
 
-    Queue<String> _statusStack = new Queue();
-    Queue _valueStack = new Queue();
+    Queue<String> statusStack = new Queue();
+    Queue valueStack = new Queue();
+    Queue<TypeMirror> typeMirrorStack = new Queue();
+    typeMirrorStack.addFirst(reflectType(t));
 
-    Queue<Token> _tokens = new JsonTokenizer(json).tokens;
+    Queue<Token> tokens = new JsonTokenizer(json).tokens;
 
-    while (_tokens.isNotEmpty) {
-      Token token = _tokens.removeFirst();
+    while (tokens.isNotEmpty) {
+      Token token = tokens.removeFirst();
 
 //      if (_tokens.length == 1 && token.type == "value-separator") {
 //        throwError(token);
 //      }
 
-      switch(_state) {
+      switch(state) {
         case STATE.INIT:
+          TypeMirror typeMirror = typeMirrorStack.first;
           switch(token.type) {
             case "value":
-              _state = STATE.FINISHED_VALUE;
+              state = STATE.FINISHED_VALUE;
               var value = _codecs[typeMirror.qualifiedName].decode(token.value);
-              _valueStack.addFirst(value);
+              valueStack.addFirst(value);
               break;
             case "begin-object":
               var codec = _codecs[typeMirror.qualifiedName];
@@ -61,8 +62,8 @@ class JsonParser {
                 codec = new DefaultCodec(typeMirror);
               }
               var value = codec.decode(token.value);
-              _valueStack.addFirst(value);
-              _state = STATE.IN_OBJECT;
+              valueStack.addFirst(value);
+              state = STATE.IN_OBJECT;
               break;
             case "begin-array":
               var codec = _codecs[typeMirror.qualifiedName];
@@ -70,8 +71,8 @@ class JsonParser {
                 codec = new DefaultCodec(typeMirror);
               }
               var value = codec.decode(token.value);
-              _valueStack.addFirst(value);
-              _state = STATE.IN_ARRAY;
+              valueStack.addFirst(value);
+              state = STATE.IN_ARRAY;
               break;
             default:
               throwError(token);
@@ -80,7 +81,7 @@ class JsonParser {
         case STATE.FINISHED_VALUE:
           switch(token.type) {
             case "eof":
-              _state = STATE.EOF;
+              state = STATE.EOF;
               break;
             default:
               throwError(token);
@@ -90,30 +91,38 @@ class JsonParser {
           switch(token.type) {
             case "value":
               //TODO verify value is a String
-              _tokens.removeFirst(); //TODO verify name-separator
-              var valueToSet = _tokens.removeFirst().value;
-              //TODO check for nested objects
-
-              InstanceMirror im = reflect(_valueStack.first);
-
+              tokens.removeFirst(); //TODO verify name-separator
+              var valueToken = tokens.removeFirst();
+              var valueToSet = valueToken.value;
+              InstanceMirror im = reflect(valueStack.first);
               Symbol symbol = new Symbol(token.value + "=");
               MethodMirror setter = im.type.instanceMembers[symbol];
-              var codec = _codecs[setter.parameters.first.type.qualifiedName];
-              //TODO check if codec is null
+              TypeMirror valueTypeMirror = setter.parameters.first.type;
+              var codec = _codecs[valueTypeMirror.qualifiedName];
+              if (codec == null) {
+                codec = new DefaultCodec(setter.parameters.first.type);
+              }
               var value = codec.decode(valueToSet);
               im.setField(new Symbol(token.value), value);
 
-              _state = STATE.FINISHED_OBJECT_ENTRY;
+              //TODO check for nested objects
+              if (valueToken.type == "value") {
+                state = STATE.FINISHED_OBJECT_ENTRY;
+              } else if (valueToken.type == "begin-array") {
+                typeMirrorStack.addFirst(valueTypeMirror);
+                valueStack.addFirst(value);
+                state = STATE.IN_ARRAY;
+              }
               break;
             case "end-object":
-              if(_valueStack.length > 1) {
-                _valueStack.removeFirst();
-                if (_valueStack.first is Iterable) {
-                  _state = STATE.FINISHED_ARRAY_ENTRY;
+              if(valueStack.length > 1) {
+                valueStack.removeFirst();
+                if (valueStack.first is Iterable) {
+                  state = STATE.IN_ARRAY;
                 }
                 //TODO handle else
               } else {
-                _state = STATE.FINISHED_VALUE;
+                state = STATE.FINISHED_VALUE;
               }
               break;
             default:
@@ -123,29 +132,33 @@ class JsonParser {
         case STATE.FINISHED_OBJECT_ENTRY:
           switch(token.type) {
             case "end-object":
-              if(_valueStack.length > 1) {
-                _valueStack.removeFirst();
-                if (_valueStack.first is Iterable) {
-                  _state = STATE.FINISHED_ARRAY_ENTRY;
+              if(valueStack.length > 1) {
+                valueStack.removeFirst();
+                if (valueStack.first is Iterable) {
+                  state = STATE.IN_ARRAY;
                 }
                 //TODO handle else
               } else {
-                _state = STATE.FINISHED_VALUE;
+                state = STATE.FINISHED_VALUE;
               }
               break;
             case "value-separator":
-              _state = STATE.IN_OBJECT;
+              state = STATE.IN_OBJECT;
               break;
             default:
               throwError(token);
           }
           break;
         case STATE.IN_ARRAY:
+          TypeMirror typeMirror = typeMirrorStack.first;
           switch(token.type) {
+            case "value-separator":
+              state = STATE.IN_ARRAY;
+              break;
             case "value":
               var value = _codecs[typeMirror.typeArguments.first.qualifiedName].decode(token.value);
-              _valueStack.first.add(value);
-              _state = STATE.FINISHED_ARRAY_ENTRY;
+              valueStack.first.add(value);
+              state = STATE.IN_ARRAY;
               break;
             case "begin-object":
               var codec = _codecs[typeMirror.typeArguments.first.qualifiedName];
@@ -153,24 +166,34 @@ class JsonParser {
                 codec = new DefaultCodec(typeMirror.typeArguments.first);
               }
               var value = codec.decode(token.value);
-              _valueStack.first.add(value);
-              _valueStack.addFirst(value);
-              _state = STATE.IN_OBJECT;
+              valueStack.first.add(value);
+              valueStack.addFirst(value);
+              state = STATE.IN_OBJECT;
+              break;
+            case "begin-array":
+              var valueTypeMirror = typeMirror.typeArguments.first;
+              var codec = _codecs[valueTypeMirror.qualifiedName];
+              if (codec == null) {
+                codec = new DefaultCodec(valueTypeMirror);
+              }
+              var value = codec.decode(token.value);
+              valueStack.first.add(value);
+              valueStack.addFirst(value);
+              typeMirrorStack.addFirst(valueTypeMirror);
               break;
             case "end-array":
-              _state = STATE.FINISHED_VALUE;
-              break;
-            default:
-              throwError(token);
-          }
-          break;
-        case STATE.FINISHED_ARRAY_ENTRY:
-          switch(token.type) {
-            case "value-separator":
-              _state = STATE.IN_ARRAY;
-              break;
-            case "end-array":
-              _state = STATE.FINISHED_VALUE;
+              if(valueStack.length > 1) {
+                valueStack.removeFirst();
+                typeMirrorStack.removeFirst();
+                if (valueStack.first is Iterable) {
+                  state = STATE.IN_ARRAY;
+                } else {
+                  state = STATE.FINISHED_OBJECT_ENTRY;
+                }
+                //TODO handle else
+              } else {
+                state = STATE.FINISHED_VALUE;
+              }
               break;
             default:
               throwError(token);
@@ -180,11 +203,11 @@ class JsonParser {
           throwError(token);
           break;
       }
-      if (_state == STATE.EOF) {
-        if (_statusStack.isNotEmpty) {
+      if (state == STATE.EOF) {
+        if (statusStack.isNotEmpty) {
           throwError(token);
         }
-        return _valueStack.removeFirst();
+        return valueStack.removeFirst();
       }
     }
   }
