@@ -121,7 +121,7 @@ class JsonTokenizer {
           _index++;
           break;
         default:
-          throw new ArgumentError("Unknown type");
+          throw new ArgumentError("Syntax Error: Unexpected token $character");
       }
 
       Token token = new Token();

@@ -169,9 +169,6 @@ class JsonParser {
             case "value-separator":
               _state = STATE.IN_ARRAY;
               break;
-//            case "begin-object":
-//              _state = STATE.IN_OBJECT;
-//              break;
             case "end-array":
               _state = STATE.FINISHED_VALUE;
               break;
