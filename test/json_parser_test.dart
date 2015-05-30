@@ -105,33 +105,43 @@ main() async {
     });
 
     test("handles objects with property value of empty array", () {
-      var result = parser.parse('{"array":[]}', NestedListFixture);
-      expect(result, new isInstanceOf<NestedListFixture>());
+      var result = parser.parse('{"array":[]}', ComplexFixture);
+      expect(result, new isInstanceOf<ComplexFixture>());
       expect(result.array, isEmpty);
     });
 
     test("handles objects with property value of array with single item", () {
-      var result = parser.parse('{"array":["hello"]}', NestedListFixture);
-      expect(result, new isInstanceOf<NestedListFixture>());
+      var result = parser.parse('{"array":["hello"]}', ComplexFixture);
+      expect(result, new isInstanceOf<ComplexFixture>());
       expect(result.array, ["hello"]);
     });
 
     test("handles objects with property value of array with multiple items", () {
-      var result = parser.parse('{"array":["hello","world"]}', NestedListFixture);
-      expect(result, new isInstanceOf<NestedListFixture>());
+      var result = parser.parse('{"array":["hello","world"]}', ComplexFixture);
+      expect(result, new isInstanceOf<ComplexFixture>());
       expect(result.array, ["hello", "world"]);
     });
 
-    test("handles objects with property value of array with multiple mixed items", () {
-      expect(parser.parse('{"array":["hello","world",123,true,1.1]}'), isTrue);
-    });
+//    test("handles objects with property value of array with multiple mixed items", () {
+//      expect(parser.parse('{"array":["hello","world",123,true,1.1]}'), isTrue);
+//    });
 
-    test("handles objects with multiple mixed property values with multiple mixed items", () {
-      expect(parser.parse('{"array":["hello","world",123,true,1.1], "good": null, "this": 123, "works": [9]}'), isTrue);
+    test("handles objects with multiple properties whose values have different types", () {
+      var result = parser.parse('{"array":["hello","world"], "good": null, "thisInt": 123, "works": [9]}', ComplexFixture);
+      expect(result, new isInstanceOf<ComplexFixture>());
+      expect(result.array, ["hello", "world"]);
+      expect(result.good, isNull);
+      expect(result.thisInt, 123);
+      expect(result.works, [9]);
     });
 
     test("handles objects with property value of empty object", () {
-      expect(parser.parse('{"array":{}}'), isTrue);
+      var result = parser.parse('{"anObject":{}}', ComplexFixture);
+      expect(result, new isInstanceOf<ComplexFixture>());
+      expect(result.anObject, new isInstanceOf<Fixture>());
+      expect(result.anObject.hello, isNull);
+      expect(result.anObject.world, isNull);
+      expect(result.anObject.cool, isNull);
     });
   });
 
@@ -178,6 +188,10 @@ class Fixture {
   String cool;
 }
 
-class NestedListFixture {
+class ComplexFixture {
+  Fixture anObject;
   List<String> array;
+  Object good;
+  int thisInt;
+  List<int> works;
 }
