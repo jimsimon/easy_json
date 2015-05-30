@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 import "package:json_tokenizer/json_tokenizer.dart";
 
 main() async {
-  var parser;
+  JsonParser parser;
   setUp((){
     parser = new JsonParser();
   });
@@ -148,36 +148,39 @@ main() async {
   group("negative tests", (){
     group("does not allow mismatching braces and brackets", (){
       test("bracket then brace", (){
-        expect(() => parser.parse('[}'), throwsArgumentError);
+        Type type = new TypeToken<List<String>>().type;
+        expect(() => parser.parse('[}', type), throwsArgumentError);
       });
 
       test("brace then bracket", (){
-        expect(() => parser.parse('{]'), throwsArgumentError);
+        expect(() => parser.parse('{]', Object), throwsArgumentError);
       });
 
       test("valid braces extra bracket at front", (){
-        expect(() => parser.parse('[{}'), throwsArgumentError);
+        Type type = new TypeToken<List<String>>().type;
+        expect(() => parser.parse('[{}', type), throwsArgumentError);
       });
 
       test("valid braces extra bracket at end", (){
-        expect(() => parser.parse('{}]'), throwsArgumentError);
+        expect(() => parser.parse('{}]', Object), throwsArgumentError);
       });
     });
 
     test("does not allow comma after array", (){
-      expect(() => parser.parse('[],'), throwsArgumentError);
+      Type type = new TypeToken<List<String>>().type;
+      expect(() => parser.parse('[],', type), throwsArgumentError);
     });
 
     test("does not allow comma after object", (){
-      expect(() => parser.parse('{},'), throwsArgumentError);
+      expect(() => parser.parse('{},', Object), throwsArgumentError);
     });
 
     test("does not allow a comma after top level value", (){
-      expect(() => parser.parse('"hello",'), throwsArgumentError);
+      expect(() => parser.parse('"hello",', String), throwsArgumentError);
     });
 
     test("does not allow only a comma", (){
-      expect(() => parser.parse(','), throwsArgumentError);
+      expect(() => parser.parse(',', String), throwsArgumentError);
     });
   });
 }
