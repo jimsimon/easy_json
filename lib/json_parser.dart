@@ -62,25 +62,21 @@ class JsonParser {
     while (tokens.isNotEmpty) {
       Token token = tokens.removeFirst();
 
-//      if (_tokens.length == 1 && token.type == "value-separator") {
-//        throwError(token);
-//      }
-
       switch(state) {
         case STATE.INIT:
           TypeMirror typeMirror = typeMirrorStack.first;
           switch(token.type) {
-            case "value":
+            case TokenType.VALUE:
               state = STATE.FINISHED_VALUE;
               var value = convertValueToType(token.value, typeMirror);
               valueStack.addFirst(value);
               break;
-            case "begin-object":
+            case TokenType.BEGIN_OBJECT:
               var value = convertValueToType(token.value, typeMirror);
               valueStack.addFirst(value);
               state = STATE.IN_OBJECT;
               break;
-            case "begin-array":
+            case TokenType.BEGIN_ARRAY:
               var value = convertValueToType(token.value, typeMirror);
               valueStack.addFirst(value);
               state = STATE.IN_ARRAY;
@@ -91,7 +87,7 @@ class JsonParser {
           break;
         case STATE.FINISHED_VALUE:
           switch(token.type) {
-            case "eof":
+            case TokenType.EOF:
               state = STATE.EOF;
               break;
             default:
@@ -100,10 +96,10 @@ class JsonParser {
           break;
         case STATE.IN_OBJECT:
           switch(token.type) {
-            case "value-separator":
+            case TokenType.VALUE_SEPARATOR:
               state = STATE.IN_OBJECT;
               break;
-            case "value":
+            case TokenType.VALUE:
               //TODO verify value is a String
               tokens.removeFirst(); //TODO verify name-separator
               var valueToken = tokens.removeFirst();
@@ -115,16 +111,16 @@ class JsonParser {
               var value = convertValueToType(valueToSet, valueTypeMirror);
               im.setField(new Symbol(token.value), value);
 
-              if (valueToken.type == "begin-array") {
+              if (valueToken.type == TokenType.BEGIN_ARRAY) {
                 typeMirrorStack.addFirst(valueTypeMirror);
                 valueStack.addFirst(value);
                 state = STATE.IN_ARRAY;
-              } else if (valueToken.type == "begin-object") {
+              } else if (valueToken.type == TokenType.BEGIN_OBJECT) {
                 typeMirrorStack.addFirst(valueTypeMirror);
                 valueStack.addFirst(value);
               }
               break;
-            case "end-object":
+            case TokenType.END_OBJECT:
               if(valueStack.length > 1) {
                 valueStack.removeFirst();
                 if (valueStack.first is Iterable) {
@@ -142,27 +138,27 @@ class JsonParser {
         case STATE.IN_ARRAY:
           TypeMirror typeMirror = typeMirrorStack.first;
           switch(token.type) {
-            case "value-separator":
+            case TokenType.VALUE_SEPARATOR:
               state = STATE.IN_ARRAY;
               break;
-            case "value":
+            case TokenType.VALUE:
               var value = convertValueToType(token.value, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               state = STATE.IN_ARRAY;
               break;
-            case "begin-object":
+            case TokenType.BEGIN_OBJECT:
               var value = convertValueToType(token.value, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               valueStack.addFirst(value);
               state = STATE.IN_OBJECT;
               break;
-            case "begin-array":
+            case TokenType.BEGIN_ARRAY:
               var value = convertValueToType(token.value, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               valueStack.addFirst(value);
               typeMirrorStack.addFirst(typeMirror.typeArguments.first);
               break;
-            case "end-array":
+            case TokenType.END_ARRAY:
               if(valueStack.length > 1) {
                 valueStack.removeFirst();
                 typeMirrorStack.removeFirst();

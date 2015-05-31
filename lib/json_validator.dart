@@ -23,28 +23,28 @@ class JsonValidator {
 
   isValid(String json) {
     STATE _state = STATE.INIT;
-    Queue<String> _stack = new Queue();
+    Queue<TokenType> _stack = new Queue();
     Queue<Token> _tokens = new JsonTokenizer(json).tokens;
 
     while (_tokens.isNotEmpty) {
       Token token = _tokens.removeFirst();
 
-      if (_tokens.length == 1 && token.type == "value-separator") {
+      if (_tokens.length == 1 && token.type == TokenType.VALUE_SEPARATOR) {
         throwError(token);
       }
 
       switch(_state) {
         case STATE.INIT:
           switch(token.type) {
-            case "begin-object":
+            case TokenType.BEGIN_OBJECT:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_OBJECT;
               break;
-            case "begin-array":
+            case TokenType.BEGIN_ARRAY:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_ARRAY;
               break;
-            case "value":
+            case TokenType.VALUE:
               _state = STATE.TOP_LEVEL_VALUE;
               break;
             default:
@@ -53,7 +53,7 @@ class JsonValidator {
           break;
         case STATE.TOP_LEVEL_VALUE:
           switch(token.type) {
-            case "eof":
+            case TokenType.EOF:
               _state = STATE.EOF;
               break;
             default:
@@ -62,11 +62,11 @@ class JsonValidator {
           break;
         case STATE.ENTERED_OBJECT:
           switch(token.type) {
-            case "end-object":
+            case TokenType.END_OBJECT:
               _stack.removeFirst();
               _state = STATE.EXITED_OBJECT;
               break;
-            case "value":
+            case TokenType.VALUE:
             //TODO only allow strings
               _state = STATE.OBJECT_KEY;
               break;
@@ -76,7 +76,7 @@ class JsonValidator {
           break;
         case STATE.OBJECT_KEY:
           switch(token.type) {
-            case "name-separator":
+            case TokenType.NAME_SEPARATOR:
               _state = STATE.OBJECT_NAME_SEPARATOR;
               break;
             default:
@@ -85,14 +85,14 @@ class JsonValidator {
           break;
         case STATE.OBJECT_NAME_SEPARATOR:
           switch(token.type) {
-            case "value":
+            case TokenType.VALUE:
               _state = STATE.OBJECT_VALUE;
               break;
-            case "begin-array":
+            case TokenType.BEGIN_ARRAY:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_ARRAY;
               break;
-            case "begin-object":
+            case TokenType.BEGIN_OBJECT:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_OBJECT;
               break;
@@ -102,11 +102,11 @@ class JsonValidator {
           break;
         case STATE.OBJECT_VALUE:
           switch(token.type) {
-            case "end-object":
+            case TokenType.END_OBJECT:
               _stack.removeFirst();
               _state = STATE.EXITED_OBJECT;
               break;
-            case "value-separator":
+            case TokenType.VALUE_SEPARATOR:
               _state = STATE.OBJECT_VALUE_SEPARATOR;
               break;
             default:
@@ -115,7 +115,7 @@ class JsonValidator {
           break;
         case STATE.OBJECT_VALUE_SEPARATOR:
           switch(token.type) {
-            case "value":
+            case TokenType.VALUE:
               _state = STATE.OBJECT_KEY;
               break;
             default:
@@ -124,18 +124,18 @@ class JsonValidator {
           break;
         case STATE.ENTERED_ARRAY:
           switch(token.type) {
-            case "begin-array":
+            case TokenType.BEGIN_ARRAY:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_ARRAY;
               break;
-            case "end-array":
+            case TokenType.END_ARRAY:
               _stack.removeFirst();
               _state = STATE.EXITED_ARRAY;
               break;
-            case "value":
+            case TokenType.VALUE:
               _state = STATE.ARRAY_VALUE;
               break;
-            case "begin-object":
+            case TokenType.BEGIN_OBJECT:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_OBJECT;
               break;
@@ -145,11 +145,11 @@ class JsonValidator {
           break;
         case STATE.ARRAY_VALUE:
           switch(token.type) {
-            case "end-array":
+            case TokenType.END_ARRAY:
               _stack.removeFirst();
               _state = STATE.EXITED_ARRAY;
               break;
-            case "value-separator":
+            case TokenType.VALUE_SEPARATOR:
               _state = STATE.ARRAY_VALUE_SEPARATOR;
               break;
             default:
@@ -158,14 +158,14 @@ class JsonValidator {
           break;
         case STATE.ARRAY_VALUE_SEPARATOR:
           switch(token.type) {
-            case "value":
+            case TokenType.VALUE:
               _state = STATE.ARRAY_VALUE;
               break;
-            case "begin-object":
+            case TokenType.BEGIN_OBJECT:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_OBJECT;
               break;
-            case "begin-array":
+            case TokenType.BEGIN_ARRAY:
               _stack.addFirst(token.type);
               _state = STATE.ENTERED_ARRAY;
               break;
@@ -175,20 +175,20 @@ class JsonValidator {
           break;
         case STATE.EXITED_OBJECT:
           switch(token.type) {
-            case "eof":
+            case TokenType.EOF:
               _state = STATE.EOF;
               break;
-            case "end-array":
+            case TokenType.END_ARRAY:
               if (_stack.isEmpty) {
                 throwError(token);
               }
               _stack.removeFirst();
               _state = STATE.EXITED_ARRAY;
               break;
-            case "value-separator":
+            case TokenType.VALUE_SEPARATOR:
               _state = STATE.ARRAY_VALUE_SEPARATOR;
               break;
-            case "end-object":
+            case TokenType.END_OBJECT:
               _stack.removeFirst();
               _state = STATE.EXITED_OBJECT;
               break;
@@ -198,21 +198,21 @@ class JsonValidator {
           break;
         case STATE.EXITED_ARRAY:
           switch(token.type) {
-            case "eof":
+            case TokenType.EOF:
               _state = STATE.EOF;
               break;
-            case "end-array":
+            case TokenType.END_ARRAY:
               _stack.removeFirst();
               _state = STATE.EXITED_ARRAY;
               break;
-            case "value-separator":
-              if (_stack.first == "begin-array") {
+            case TokenType.VALUE_SEPARATOR:
+              if (_stack.first == TokenType.BEGIN_ARRAY) {
                 _state = STATE.ARRAY_VALUE_SEPARATOR;
-              } else if (_stack.first == "begin-object"){
+              } else if (_stack.first == TokenType.BEGIN_OBJECT){
                 _state = STATE.OBJECT_VALUE_SEPARATOR;
               }
               break;
-            case "end-object":
+            case TokenType.END_OBJECT:
               _stack.removeFirst();
               _state = STATE.EXITED_OBJECT;
               break;

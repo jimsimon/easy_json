@@ -15,57 +15,81 @@ part "src/string_codec.dart";
 part "src/default_codec.dart";
 part "src/list_codec.dart";
 
+enum ValueType {
+  NUMBER,
+  BOOL,
+  STRING,
+  BEGIN_OBJECT,
+  END_OBJECT,
+  BEGIN_ARRAY,
+  END_ARRAY,
+  NULL,
+  VALUE_SEPARATOR,
+  NAME_SEPARATOR
+}
+
+enum TokenType {
+  VALUE,
+  BEGIN_OBJECT,
+  END_OBJECT,
+  BEGIN_ARRAY,
+  END_ARRAY,
+  VALUE_SEPARATOR,
+  NAME_SEPARATOR,
+  EOF
+}
+
 RegExp STRING = new RegExp(r'^"$');
 RegExp WHITESPACE = new RegExp(r"^\s$");
 
 List numberCharacters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "e", "E", "."];
 
-Map<String, String> valueTypeMap = {
-  "0": "number",
-  "1": "number",
-  "2": "number",
-  "3": "number",
-  "4": "number",
-  "5": "number",
-  "6": "number",
-  "7": "number",
-  "8": "number",
-  "9": "number",
-  "-": "number",
-  "t": "bool",
-  "f": "bool",
-  "{": "begin-object",
-  "}": "end-object",
-  "[": "begin-array",
-  "]": "end-array",
-  "n": "null",
-  ",": "value-separator",
-  ":": "name-separator",
-  '"': "string"
+Map<String, ValueType> valueTypeMap = {
+  "0": ValueType.NUMBER,
+  "1": ValueType.NUMBER,
+  "2": ValueType.NUMBER,
+  "3": ValueType.NUMBER,
+  "4": ValueType.NUMBER,
+  "5": ValueType.NUMBER,
+  "6": ValueType.NUMBER,
+  "7": ValueType.NUMBER,
+  "8": ValueType.NUMBER,
+  "9": ValueType.NUMBER,
+  "-": ValueType.NUMBER,
+  "t": ValueType.BOOL,
+  "f": ValueType.BOOL,
+  "{": ValueType.BEGIN_OBJECT,
+  "}": ValueType.END_OBJECT,
+  "[": ValueType.BEGIN_ARRAY,
+  "]": ValueType.END_ARRAY,
+  "n": ValueType.NULL,
+  ",": ValueType.VALUE_SEPARATOR,
+  ":": ValueType.NAME_SEPARATOR,
+  '"': ValueType.STRING
 };
 
-Map<String, String> tokenTypeMap = {
-  "0": "value",
-  "1": "value",
-  "2": "value",
-  "3": "value",
-  "4": "value",
-  "5": "value",
-  "6": "value",
-  "7": "value",
-  "8": "value",
-  "9": "value",
-  "-": "value",
-  "t": "value",
-  "f": "value",
-  "{": "begin-object",
-  "}": "end-object",
-  "[": "begin-array",
-  "]": "end-array",
-  "n": "value",
-  ",": "value-separator",
-  ":": "name-separator",
-  '"': "value"
+Map<String, TokenType> tokenTypeMap = {
+  "0": TokenType.VALUE,
+  "1": TokenType.VALUE,
+  "2": TokenType.VALUE,
+  "3": TokenType.VALUE,
+  "4": TokenType.VALUE,
+  "5": TokenType.VALUE,
+  "6": TokenType.VALUE,
+  "7": TokenType.VALUE,
+  "8": TokenType.VALUE,
+  "9": TokenType.VALUE,
+  "-": TokenType.VALUE,
+  "t": TokenType.VALUE,
+  "f": TokenType.VALUE,
+  "{": TokenType.BEGIN_OBJECT,
+  "}": TokenType.END_OBJECT,
+  "[": TokenType.BEGIN_ARRAY,
+  "]": TokenType.END_ARRAY,
+  "n": TokenType.VALUE,
+  ",": TokenType.VALUE_SEPARATOR,
+  ":": TokenType.NAME_SEPARATOR,
+  '"': TokenType.VALUE
 };
 
 class JsonTokenizer {
@@ -96,27 +120,27 @@ class JsonTokenizer {
       }
 
       String value;
-      var valueType = valueTypeMap[character];
-      var tokenType = tokenTypeMap[character];
+      ValueType valueType = valueTypeMap[character];
+      TokenType tokenType = tokenTypeMap[character];
       switch (valueType) {
-        case "number":
+        case ValueType.NUMBER:
           value = parseNumber();
           break;
-        case "bool":
+        case ValueType.BOOL:
           value = parseBool();
           break;
-        case "null":
+        case ValueType.NULL:
           value = parseNull();
           break;
-        case "string":
+        case ValueType.STRING:
           value = parseString();
           break;
-        case "begin-object":
-        case "end-object":
-        case "begin-array":
-        case "end-array":
-        case "name-separator":
-        case "value-separator":
+        case ValueType.BEGIN_OBJECT:
+        case ValueType.END_OBJECT:
+        case ValueType.BEGIN_ARRAY:
+        case ValueType.END_ARRAY:
+        case ValueType.NAME_SEPARATOR:
+        case ValueType.VALUE_SEPARATOR:
           value = character;
           _index++;
           break;
@@ -130,7 +154,7 @@ class JsonTokenizer {
       token.type = tokenType;
       tokens.add(token);
     }
-    tokens.add(new Token()..type="eof");
+    tokens.add(new Token()..type=TokenType.EOF);
     return tokens;
   }
 
@@ -192,7 +216,7 @@ class JsonTokenizer {
 
 
 class Token {
-  String valueType;
+  ValueType valueType;
   String value;
-  String type;
+  TokenType type;
 }
