@@ -11,6 +11,14 @@ main() async {
   });
 
   group("positive tests", () {
+    test("allows top level nulls", (){
+      expect(parser.parse("null", Object), isNull);
+    });
+
+    test("parses the string 'null' correctly", (){
+      expect(parser.parse('"null"', String), "null");
+    });
+
     test("allows top level integers", () {
       expect(parser.parse("1", int), 1);
     });

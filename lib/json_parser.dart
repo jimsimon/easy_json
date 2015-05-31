@@ -29,8 +29,8 @@ class JsonParser {
     _codecs.addAll(_loadBasicCodecs());
   }
 
-  convertValueToType(String value, TypeMirror typeMirror) {
-    if (value == "null") {
+  _convertTokenToType(Token token, TypeMirror typeMirror) {
+    if (token.valueType == ValueType.NULL) {
       return null;
     }
 
@@ -38,7 +38,7 @@ class JsonParser {
     if (codec == null) {
       codec = new DefaultCodec(typeMirror);
     }
-    return codec.decode(value);
+    return codec.decode(token.value);
   }
 
   addCodecForType(Type type, Codec codec) {
@@ -68,16 +68,16 @@ class JsonParser {
           switch(token.type) {
             case TokenType.VALUE:
               state = STATE.FINISHED_VALUE;
-              var value = convertValueToType(token.value, typeMirror);
+              var value = _convertTokenToType(token, typeMirror);
               valueStack.addFirst(value);
               break;
             case TokenType.BEGIN_OBJECT:
-              var value = convertValueToType(token.value, typeMirror);
+              var value = _convertTokenToType(token, typeMirror);
               valueStack.addFirst(value);
               state = STATE.IN_OBJECT;
               break;
             case TokenType.BEGIN_ARRAY:
-              var value = convertValueToType(token.value, typeMirror);
+              var value = _convertTokenToType(token, typeMirror);
               valueStack.addFirst(value);
               state = STATE.IN_ARRAY;
               break;
@@ -103,12 +103,11 @@ class JsonParser {
               //TODO verify value is a String
               tokens.removeFirst(); //TODO verify name-separator
               var valueToken = tokens.removeFirst();
-              var valueToSet = valueToken.value;
               InstanceMirror im = reflect(valueStack.first);
               Symbol symbol = new Symbol(token.value + "=");
               MethodMirror setter = im.type.instanceMembers[symbol];
               TypeMirror valueTypeMirror = setter.parameters.first.type;
-              var value = convertValueToType(valueToSet, valueTypeMirror);
+              var value = _convertTokenToType(valueToken, valueTypeMirror);
               im.setField(new Symbol(token.value), value);
 
               if (valueToken.type == TokenType.BEGIN_ARRAY) {
@@ -142,18 +141,18 @@ class JsonParser {
               state = STATE.IN_ARRAY;
               break;
             case TokenType.VALUE:
-              var value = convertValueToType(token.value, typeMirror.typeArguments.first);
+              var value = _convertTokenToType(token, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               state = STATE.IN_ARRAY;
               break;
             case TokenType.BEGIN_OBJECT:
-              var value = convertValueToType(token.value, typeMirror.typeArguments.first);
+              var value = _convertTokenToType(token, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               valueStack.addFirst(value);
               state = STATE.IN_OBJECT;
               break;
             case TokenType.BEGIN_ARRAY:
-              var value = convertValueToType(token.value, typeMirror.typeArguments.first);
+              var value = _convertTokenToType(token, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               valueStack.addFirst(value);
               typeMirrorStack.addFirst(typeMirror.typeArguments.first);
