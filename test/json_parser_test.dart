@@ -10,6 +10,7 @@ main() async {
     parser = new JsonParser();
   });
 
+  //TODO Add tests for Maps
   group("positive tests", () {
     test("allows top level nulls", (){
       expect(parser.parse("null", Object), isNull);
@@ -44,11 +45,11 @@ main() async {
     });
 
     test("allows object with single key-value pair", () {
-      expect(parser.parse('{"hello": "value"}', Fixture).hello, "value");
+      expect(parser.parse('{"hello": "value"}', SimpleFixture).hello, "value");
     });
 
     test("allows object with multiple key-value pairs", () {
-      Fixture result = parser.parse('{"hello": "value", "world": "value2", "cool": "value3"}', Fixture);
+      SimpleFixture result = parser.parse('{"hello": "value", "world": "value2", "cool": "value3"}', SimpleFixture);
       expect(result.hello, "value");
       expect(result.world, "value2");
       expect(result.cool, "value3");
@@ -70,42 +71,38 @@ main() async {
     });
 
     test("handles arrays with a single empty object", () {
-      Type type = new TypeToken<List<Fixture>>().type;
+      Type type = new TypeToken<List<SimpleFixture>>().type;
       var result = parser.parse('[{}]', type);
       expect(result, isList);
-      expect(result[0], new isInstanceOf<Fixture>());
+      expect(result[0], new isInstanceOf<SimpleFixture>());
     });
 
     test("handles arrays with multiple empty objects", () {
-      Type type = new TypeToken<List<Fixture>>().type;
+      Type type = new TypeToken<List<SimpleFixture>>().type;
       var result = parser.parse('[{},{}]', type);
       expect(result, isList);
-      expect(result[0], new isInstanceOf<Fixture>());
-      expect(result[1], new isInstanceOf<Fixture>());
+      expect(result[0], new isInstanceOf<SimpleFixture>());
+      expect(result[1], new isInstanceOf<SimpleFixture>());
       expect(result[0], isNot(result[1]));
     });
 
     test("handles arrays with single non-empty objects", () {
-      Type type = new TypeToken<List<Fixture>>().type;
+      Type type = new TypeToken<List<SimpleFixture>>().type;
       var result = parser.parse('[{"hello":"world"}]', type);
       expect(result, isList);
-      expect(result[0], new isInstanceOf<Fixture>());
+      expect(result[0], new isInstanceOf<SimpleFixture>());
       expect(result[0].hello, "world");
     });
 
     test("handles arrays with multiple non-empty objects", () {
-      Type type = new TypeToken<List<Fixture>>().type;
+      Type type = new TypeToken<List<SimpleFixture>>().type;
       var result = parser.parse('[{"hello":"world"},{"hello":"goodbye"}]', type);
       expect(result, isList);
-      expect(result[0], new isInstanceOf<Fixture>());
+      expect(result[0], new isInstanceOf<SimpleFixture>());
       expect(result[0].hello, "world");
-      expect(result[1], new isInstanceOf<Fixture>());
+      expect(result[1], new isInstanceOf<SimpleFixture>());
       expect(result[1].hello, "goodbye");
     });
-
-//    test("handles arrays with mixed elements", () {
-//      expect(parser.parse('[{"hello":"world"},123,"goodbye",true]'), isTrue);
-//    });
 
     test("handles arrays within arrays", () {
       Type type = new TypeToken<List<List<String>>>().type;
@@ -130,10 +127,6 @@ main() async {
       expect(result.array, ["hello", "world"]);
     });
 
-//    test("handles objects with property value of array with multiple mixed items", () {
-//      expect(parser.parse('{"array":["hello","world",123,true,1.1]}'), isTrue);
-//    });
-
     test("handles objects with multiple properties whose values have different types", () {
       var result = parser.parse('{"array":["hello","world"], "good": null, "thisInt": 123, "works": [9]}', ComplexFixture);
       expect(result, new isInstanceOf<ComplexFixture>());
@@ -146,13 +139,14 @@ main() async {
     test("handles objects with property value of empty object", () {
       var result = parser.parse('{"anObject":{}}', ComplexFixture);
       expect(result, new isInstanceOf<ComplexFixture>());
-      expect(result.anObject, new isInstanceOf<Fixture>());
+      expect(result.anObject, new isInstanceOf<SimpleFixture>());
       expect(result.anObject.hello, isNull);
       expect(result.anObject.world, isNull);
       expect(result.anObject.cool, isNull);
     });
   });
 
+  //TODO add tests for when type (including generic types) is dynamic
   group("negative tests", (){
     group("does not allow mismatching braces and brackets", (){
       test("bracket then brace", (){
@@ -193,14 +187,14 @@ main() async {
   });
 }
 
-class Fixture {
+class SimpleFixture {
   String hello;
   String world;
   String cool;
 }
 
 class ComplexFixture {
-  Fixture anObject;
+  SimpleFixture anObject;
   List<String> array;
   Object good;
   int thisInt;

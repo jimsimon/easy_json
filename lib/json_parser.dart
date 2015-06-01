@@ -29,18 +29,6 @@ class JsonParser {
     _codecs.addAll(_loadBasicCodecs());
   }
 
-  _convertTokenToType(Token token, TypeMirror typeMirror) {
-    if (token.valueType == ValueType.NULL) {
-      return null;
-    }
-
-    var codec = _codecs[typeMirror.qualifiedName];
-    if (codec == null) {
-      codec = new DefaultCodec(typeMirror);
-    }
-    return codec.decode(token.value);
-  }
-
   addCodecForType(Type type, Codec codec) {
     addCodecForSymbol(reflectType(type).qualifiedName, codec);
   }
@@ -82,7 +70,7 @@ class JsonParser {
               state = STATE.IN_ARRAY;
               break;
             default:
-              throwError(token);
+              _throwError(token);
           }
           break;
         case STATE.FINISHED_VALUE:
@@ -91,7 +79,7 @@ class JsonParser {
               state = STATE.EOF;
               break;
             default:
-              throwError(token);
+              _throwError(token);
           }
           break;
         case STATE.IN_OBJECT:
@@ -131,7 +119,7 @@ class JsonParser {
               }
               break;
             default:
-              throwError(token);
+              _throwError(token);
           }
           break;
         case STATE.IN_ARRAY:
@@ -171,23 +159,36 @@ class JsonParser {
               }
               break;
             default:
-              throwError(token);
+              _throwError(token);
           }
           break;
         default:
-          throwError(token);
+          _throwError(token);
           break;
       }
       if (state == STATE.EOF) {
         if (statusStack.isNotEmpty) {
-          throwError(token);
+          _throwError(token);
         }
         return valueStack.removeFirst();
       }
     }
   }
+
+  _convertTokenToType(Token token, TypeMirror typeMirror) {
+    if (token.valueType == ValueType.NULL) {
+      return null;
+    }
+
+    var codec = _codecs[typeMirror.qualifiedName];
+    if (codec == null) {
+      codec = new DefaultCodec(typeMirror);
+    }
+    return codec.decode(token.value);
+  }
+
+  void _throwError(Token token) {
+    throw new ArgumentError("Unexpected token: ${token.value}");
+  }
 }
 
-void throwError(Token token) {
-  throw new ArgumentError("Unexpected token: ${token.value}");
-}

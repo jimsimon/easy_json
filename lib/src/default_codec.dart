@@ -6,28 +6,28 @@ class DefaultCodec<T> extends Codec<T, String> {
   const DefaultCodec(TypeMirror this.tm);
 
   @override
-  Converter<String, T> get decoder => new _DefaultDecoder<T>(tm);
+  Converter<String, dynamic> get decoder => new _DefaultDecoder(tm);
 
   @override
-  Converter<T, String> get encoder => const _DefaultEncoder<T>();
+  Converter<dynamic, String> get encoder => const _DefaultEncoder();
 }
 
-class _DefaultDecoder<T> extends Converter<String, T> {
+class _DefaultDecoder extends Converter<String, dynamic> {
 
   final TypeMirror tm;
   _DefaultDecoder(TypeMirror this.tm);
 
   @override
-  T convert(String input){
+  dynamic convert(String input){
     return (tm as ClassMirror).newInstance(const Symbol(""), []).reflectee;
   }
 
 }
 
-class _DefaultEncoder<T> extends Converter<T, String> {
+class _DefaultEncoder extends Converter<dynamic, String> {
 
   const _DefaultEncoder();
 
   @override
-  String convert(T input) => input.toString();
+  String convert(dynamic input) => input.toString();
 }
