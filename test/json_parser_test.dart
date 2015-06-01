@@ -187,12 +187,14 @@ main() async {
   });
 }
 
+@Serializable
 class SimpleFixture {
   String hello;
   String world;
   String cool;
 }
 
+@Serializable
 class ComplexFixture {
   SimpleFixture anObject;
   List<String> array;

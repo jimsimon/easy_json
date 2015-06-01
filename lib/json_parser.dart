@@ -8,6 +8,12 @@ enum STATE {
   EOF
 }
 
+
+class _Serializable {
+  const _Serializable();
+}
+const Serializable = const _Serializable();
+
 class TypeToken<T> {
   Type get type => reflectType(T).reflectedType;
 }

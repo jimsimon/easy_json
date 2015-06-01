@@ -4,7 +4,7 @@ library json_tokenizer;
 import "dart:collection";
 import "dart:convert";
 
-//@MirrorsUsed(targets: const [int, double, bool, String])
+@MirrorsUsed(targets: const [int, double, bool, String, num, List, Map, Set, Object], metaTargets: const [_Serializable])
 import "dart:mirrors";
 
 part "json_parser.dart";
