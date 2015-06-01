@@ -144,6 +144,20 @@ main() async {
       expect(result.anObject.world, isNull);
       expect(result.anObject.cool, isNull);
     });
+
+    test("allows empty maps", (){
+      Type type = new TypeToken<Map<String, String>>().type;
+      var result = parser.parse("{}", type);
+      expect(result, new isInstanceOf<Map>());
+      expect(result, isEmpty);
+    });
+
+    test("allows maps with single simple key and value", (){
+      Type type = new TypeToken<Map<String, String>>().type;
+      var result = parser.parse('{"hello": "world"}', type);
+      expect(result, new isInstanceOf<Map>());
+      expect(result["hello"], "world");
+    });
   });
 
   //TODO add tests for when type (including generic types) is dynamic

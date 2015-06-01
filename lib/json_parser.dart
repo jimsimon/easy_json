@@ -98,11 +98,20 @@ class JsonParser {
               tokens.removeFirst(); //TODO verify name-separator
               var valueToken = tokens.removeFirst();
               InstanceMirror im = reflect(valueStack.first);
-              Symbol symbol = new Symbol(token.value + "=");
-              MethodMirror setter = im.type.instanceMembers[symbol];
-              TypeMirror valueTypeMirror = setter.parameters.first.type;
-              var value = _convertTokenToType(valueToken, valueTypeMirror);
-              im.setField(new Symbol(token.value), value);
+              TypeMirror valueTypeMirror;
+              var value;
+              if (valueStack.first is Map) {
+                //TODO Make sure first type argument is String
+                valueTypeMirror = im.type.typeArguments[1];
+                value = _convertTokenToType(valueToken, valueTypeMirror);
+                valueStack.first[token.value] = value;
+              } else {
+                Symbol symbol = new Symbol(token.value + "=");
+                MethodMirror setter = im.type.instanceMembers[symbol];
+                valueTypeMirror = setter.parameters.first.type;
+                value = _convertTokenToType(valueToken, valueTypeMirror);
+                im.setField(new Symbol(token.value), value);
+              }
 
               if (valueToken.type == TokenType.BEGIN_ARRAY) {
                 typeMirrorStack.addFirst(valueTypeMirror);
