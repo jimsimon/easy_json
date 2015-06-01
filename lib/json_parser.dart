@@ -128,7 +128,6 @@ class JsonParser {
                 if (valueStack.first is Iterable) {
                   state = STATE.IN_ARRAY;
                 }
-                //TODO handle else
               } else {
                 state = STATE.FINISHED_VALUE;
               }
@@ -164,9 +163,7 @@ class JsonParser {
               if(valueStack.length > 1) {
                 valueStack.removeFirst();
                 typeMirrorStack.removeFirst();
-                if (valueStack.first is Iterable) {
-                  state = STATE.IN_ARRAY;
-                } else {
+                if (valueStack.first is! Iterable) {
                   state = STATE.IN_OBJECT;
                 }
               } else {
