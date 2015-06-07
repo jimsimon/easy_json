@@ -27,7 +27,8 @@ class JsonParser {
       reflectType(int).qualifiedName: const IntCodec(),
       reflectType(double).qualifiedName: const DoubleCodec(),
       reflectType(bool).qualifiedName: const BoolCodec(),
-      reflectType(String).qualifiedName: const StringCodec()
+      reflectType(String).qualifiedName: const StringCodec(),
+      reflectType(List).qualifiedName: const ListCodec()
     };
   }
 

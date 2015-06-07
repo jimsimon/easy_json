@@ -13,6 +13,7 @@ part "src/double_codec.dart";
 part "src/bool_codec.dart";
 part "src/string_codec.dart";
 part "src/default_codec.dart";
+part "src/list_codec.dart";
 
 enum ValueType {
   NUMBER,
