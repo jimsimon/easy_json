@@ -1,5 +1,4 @@
-/// The json_tokenizer library.
-library json_tokenizer;
+library json_lexer;
 
 import "dart:collection";
 
@@ -27,12 +26,12 @@ enum TokenType {
   EOF
 }
 
-RegExp STRING = new RegExp(r'^"$');
-RegExp WHITESPACE = new RegExp(r"^\s$");
+RegExp _STRING = new RegExp(r'^"$');
+RegExp _WHITESPACE = new RegExp(r"^\s$");
 
-List numberCharacters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "e", "E", "."];
+List _numberCharacters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "e", "E", "."];
 
-Map<String, ValueType> valueTypeMap = {
+Map<String, ValueType> _valueTypeMap = {
   "0": ValueType.NUMBER,
   "1": ValueType.NUMBER,
   "2": ValueType.NUMBER,
@@ -56,7 +55,7 @@ Map<String, ValueType> valueTypeMap = {
   '"': ValueType.STRING
 };
 
-Map<String, TokenType> tokenTypeMap = {
+Map<String, TokenType> _tokenTypeMap = {
   "0": TokenType.VALUE,
   "1": TokenType.VALUE,
   "2": TokenType.VALUE,
@@ -80,13 +79,13 @@ Map<String, TokenType> tokenTypeMap = {
   '"': TokenType.VALUE
 };
 
-class JsonTokenizer {
+class JsonLexer {
 
   int _index = 0;
   String _json;
   Queue<Token> tokens;
 
-  JsonTokenizer(String this._json) {
+  JsonLexer(String this._json) {
     tokens = _tokenize();
   }
 
@@ -102,14 +101,14 @@ class JsonTokenizer {
     Queue<Token> tokens = new Queue();
     while(_index != _json.length) {
       String character = _json[_index];
-      while (WHITESPACE.hasMatch(character)) {
+      while (_WHITESPACE.hasMatch(character)) {
         _index++;
         character = _json[_index];
       }
 
       String value;
-      ValueType valueType = valueTypeMap[character];
-      TokenType tokenType = tokenTypeMap[character];
+      ValueType valueType = _valueTypeMap[character];
+      TokenType tokenType = _tokenTypeMap[character];
       switch (valueType) {
         case ValueType.NUMBER:
           value = parseNumber();
@@ -150,7 +149,7 @@ class JsonTokenizer {
     String number = "";
 
     String character = _json[_index];
-    while(numberCharacters.contains(character)) {
+    while(_numberCharacters.contains(character)) {
       number += character;
       _index++;
       if (_index == _json.length) {

@@ -1,7 +1,7 @@
 library v5;
 
 import "dart:collection";
-import "package:json_tokenizer/json_tokenizer.dart";
+import "package:json_lexer/json_lexer.dart";
 
 enum STATE {
   INIT,
@@ -24,7 +24,7 @@ class JsonValidator {
   isValid(String json) {
     STATE _state = STATE.INIT;
     Queue<TokenType> _stack = new Queue();
-    Queue<Token> _tokens = new JsonTokenizer(json).tokens;
+    Queue<Token> _tokens = new JsonLexer(json).tokens;
 
     while (_tokens.isNotEmpty) {
       Token token = _tokens.removeFirst();

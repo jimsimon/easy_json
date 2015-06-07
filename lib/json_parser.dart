@@ -5,7 +5,7 @@ import "dart:mirrors";
 import "dart:convert";
 import "dart:collection";
 
-import "package:json_tokenizer/json_tokenizer.dart";
+import "package:json_lexer/json_lexer.dart";
 
 part "src/int_codec.dart";
 part "src/double_codec.dart";
@@ -66,7 +66,7 @@ class JsonParser {
     Queue<TypeMirror> typeMirrorStack = new Queue();
     typeMirrorStack.addFirst(reflectType(t));
 
-    Queue<Token> tokens = new JsonTokenizer(json).tokens;
+    Queue<Token> tokens = new JsonLexer(json).tokens;
 
     while (tokens.isNotEmpty) {
       Token token = tokens.removeFirst();

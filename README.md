@@ -1,2 +1,2 @@
-# json_tokenizer
-A JSON tokenizer written in Dart.
+# json_lexer
+A JSON lexer written in Dart.
