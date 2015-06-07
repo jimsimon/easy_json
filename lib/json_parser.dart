@@ -1,4 +1,18 @@
-part of json_tokenizer;
+library json_parser;
+
+@MirrorsUsed(targets: const [int, double, bool, String, num, List, Map, Set, Object], metaTargets: const [_Serializable])
+import "dart:mirrors";
+import "dart:convert";
+import "dart:collection";
+
+import "package:json_tokenizer/json_tokenizer.dart";
+
+part "src/int_codec.dart";
+part "src/double_codec.dart";
+part "src/bool_codec.dart";
+part "src/string_codec.dart";
+part "src/default_codec.dart";
+part "src/list_codec.dart";
 
 enum STATE {
   INIT,

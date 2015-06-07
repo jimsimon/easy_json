@@ -12,76 +12,76 @@ void main() {
     test("can handle ints", () {
       JsonTokenizer tokenizer = new JsonTokenizer("2");
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "number");
+      expect(token.valueType, ValueType.NUMBER);
       expect(token.value, "2");
     });
 
     test("can handle doubles", () {
       JsonTokenizer tokenizer = new JsonTokenizer("2.1");
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "number");
+      expect(token.valueType, ValueType.NUMBER);
       expect(token.value, "2.1");
     });
 
     test("can handle Strings", () {
       JsonTokenizer tokenizer = new JsonTokenizer('"hello"');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "string");
+      expect(token.valueType, ValueType.STRING);
       expect(token.value, "hello");
     });
 
     test("can handle bools", () {
       JsonTokenizer tokenizer = new JsonTokenizer('true');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "bool");
+      expect(token.valueType, ValueType.BOOL);
       expect(token.value, "true");
 
       tokenizer = new JsonTokenizer('false');
       token = tokenizer.nextToken();
-      expect(token.valueType, "bool");
+      expect(token.valueType, ValueType.BOOL);
       expect(token.value, "false");
     });
 
     test("can handle objects", () {
       JsonTokenizer tokenizer = new JsonTokenizer('{}');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "begin-object");
+      expect(token.valueType, ValueType.BEGIN_OBJECT);
       expect(token.value, "{");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "end-object");
+      expect(token.valueType, ValueType.END_OBJECT);
       expect(token.value, "}");
     });
 
     test("can handle arrays", () {
       JsonTokenizer tokenizer = new JsonTokenizer('[]');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "begin-array");
+      expect(token.valueType, ValueType.BEGIN_ARRAY);
       expect(token.value, "[");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "end-array");
+      expect(token.valueType, ValueType.END_ARRAY);
       expect(token.value, "]");
     });
 
     test("can handle null", () {
       JsonTokenizer tokenizer = new JsonTokenizer('null');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "null");
+      expect(token.valueType, ValueType.NULL);
       expect(token.value, "null");
     });
 
     test("can handle commas", () {
       JsonTokenizer tokenizer = new JsonTokenizer(',');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "value-separator");
+      expect(token.valueType, ValueType.VALUE_SEPARATOR);
       expect(token.value, ",");
     });
 
     test("can handle colons", () {
       JsonTokenizer tokenizer = new JsonTokenizer(':');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "name-separator");
+      expect(token.valueType, ValueType.NAME_SEPARATOR);
       expect(token.value, ":");
     });
 
@@ -92,34 +92,34 @@ void main() {
     test("can handle input with multiple tokens", () {
       JsonTokenizer tokenizer = new JsonTokenizer('{}');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "begin-object");
+      expect(token.valueType, ValueType.BEGIN_OBJECT);
       expect(token.value, "{");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "end-object");
+      expect(token.valueType, ValueType.END_OBJECT);
       expect(token.value, "}");
     });
 
     test("can handle input with multiple tokens", () {
       JsonTokenizer tokenizer = new JsonTokenizer('{"test": 123}');
       Token token = tokenizer.nextToken();
-      expect(token.valueType, "begin-object");
+      expect(token.valueType, ValueType.BEGIN_OBJECT);
       expect(token.value, "{");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "string");
+      expect(token.valueType, ValueType.STRING);
       expect(token.value, "test");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "name-separator");
+      expect(token.valueType, ValueType.NAME_SEPARATOR);
       expect(token.value, ":");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "number");
+      expect(token.valueType, ValueType.NUMBER);
       expect(token.value, "123");
 
       token = tokenizer.nextToken();
-      expect(token.valueType, "end-object");
+      expect(token.valueType, ValueType.END_OBJECT);
       expect(token.value, "}");
     });
 

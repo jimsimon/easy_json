@@ -1,4 +1,4 @@
-part of json_tokenizer;
+part of json_parser;
 
 //FIXME This is needed until https://github.com/dart-lang/sdk/issues/21927 is resolved.
 class ListCodec extends Codec<List, String> {

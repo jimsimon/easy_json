@@ -1,4 +1,4 @@
-part of json_tokenizer;
+part of json_parser;
 
 class DoubleCodec extends Codec<double, String> {
 

@@ -1,4 +1,4 @@
-part of json_tokenizer;
+part of json_parser;
 
 class BoolCodec extends Codec<bool, String> {
 

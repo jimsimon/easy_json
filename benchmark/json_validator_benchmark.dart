@@ -1,4 +1,4 @@
-import "package:json_tokenizer/json_validator.dart";
+import "../lib/json_validator.dart";
 
 runSuite(iterationCount) {
   for (int i = 0; i < 5; i++) {
