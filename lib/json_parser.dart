@@ -22,7 +22,6 @@ enum STATE {
   EOF
 }
 
-
 class _Serializable {
   const _Serializable();
 }

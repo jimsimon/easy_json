@@ -2,7 +2,7 @@ library json_parser.test;
 
 import 'package:test/test.dart';
 
-import "package:json_lexer/json_parser.dart";
+import "package:json_parser/json_parser.dart";
 
 main() async {
   JsonParser parser;
@@ -152,11 +152,41 @@ main() async {
       expect(result, isEmpty);
     });
 
-    test("allows maps with single simple key and value", (){
+    test("allows maps with single valid key and simple value", (){
       Type type = new TypeToken<Map<String, String>>().type;
       var result = parser.parse('{"hello": "world"}', type);
       expect(result, new isInstanceOf<Map>());
       expect(result["hello"], "world");
+    });
+
+    test("allows maps with single valid key and object value", (){
+      Type type = new TypeToken<Map<String, Object>>().type;
+      var result = parser.parse('{"hello": {}}', type);
+      expect(result, new isInstanceOf<Map>());
+      expect(result["hello"], new isInstanceOf<Object>());
+    });
+
+    test("allows maps with single valid key and map value", (){
+      Type type = new TypeToken<Map<String, Map<String, String>>>().type;
+      var result = parser.parse('{"hello": {"goodbye": "world"}}', type);
+      expect(result, new isInstanceOf<Map>());
+      expect(result["hello"], new isInstanceOf<Map>());
+      expect(result["hello"]["goodbye"], "world");
+    });
+
+    test("allows maps with single valid key and array value", (){
+      Type type = new TypeToken<Map<String, List<String>>>().type;
+      var result = parser.parse('{"hello": []}', type);
+      expect(result, new isInstanceOf<Map>());
+      expect(result["hello"], new isInstanceOf<List>());
+    });
+
+    test("allows maps with single valid key and array value with simple values", (){
+      Type type = new TypeToken<Map<String, List<String>>>().type;
+      var result = parser.parse('{"hello": ["world"]}', type);
+      expect(result, new isInstanceOf<Map>());
+      expect(result["hello"], new isInstanceOf<List>());
+      expect(result["hello"][0], "world");
     });
   });
 

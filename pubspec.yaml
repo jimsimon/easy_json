@@ -1,9 +1,12 @@
-name: json_lexer
+name: json_parser
 description: A lexer for creating tokens from JSON.
 version: 1.0.0
 author: Jim Simon <jim.j.simon@gmail.com>
 #homepage: https://www.example.com
 environment:
   sdk: '>=1.0.0 <2.0.0'
+dependencies:
+  json_lexer: "^1.0.0"
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
+  http: any
