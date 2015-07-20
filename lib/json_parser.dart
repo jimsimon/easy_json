@@ -6,6 +6,7 @@ import "dart:convert";
 import "dart:collection";
 
 import "package:json_lexer/json_lexer.dart";
+export "package:json_lexer/json_lexer.dart" show LexerException;
 
 part "src/int_codec.dart";
 part "src/double_codec.dart";
@@ -108,14 +109,17 @@ class JsonParser {
               state = STATE.IN_OBJECT;
               break;
             case TokenType.VALUE:
-              //TODO verify value is a String
-              tokens.removeFirst(); //TODO verify name-separator
+              tokens.removeFirst(); //Account for name-separator token
               var valueToken = tokens.removeFirst();
               InstanceMirror im = reflect(valueStack.first);
               TypeMirror valueTypeMirror;
               var value;
               if (valueStack.first is Map) {
                 //TODO Make sure first type argument is String
+                var keyTypeMirror = im.type.typeArguments[0];
+                if (keyTypeMirror.qualifiedName != reflectType(String).qualifiedName) {
+                  throw new ArgumentError("Invalid map key type of ${keyTypeMirror.qualifiedName}.  Map keys must be of type String");
+                }
                 valueTypeMirror = im.type.typeArguments[1];
                 value = _convertTokenToType(valueToken, valueTypeMirror);
                 valueStack.first[token.value] = value;

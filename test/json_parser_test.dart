@@ -10,7 +10,6 @@ main() async {
     parser = new JsonParser();
   });
 
-  //TODO Add tests for Maps
   group("positive tests", () {
     test("allows top level nulls", (){
       expect(parser.parse("null", Object), isNull);
@@ -210,6 +209,15 @@ main() async {
       test("valid braces extra bracket at end", (){
         expect(() => parser.parse('{}]', Object), throwsArgumentError);
       });
+
+      test("valid braces extra brace at front", (){
+        Type type = new TypeToken<List<String>>().type;
+        expect(() => parser.parse('{[]', type), throwsArgumentError);
+      });
+
+      test("valid braces extra brace at end", (){
+        expect(() => parser.parse('[]}', Object), throwsArgumentError);
+      });
     });
 
     test("does not allow comma after array", (){
@@ -227,6 +235,17 @@ main() async {
 
     test("does not allow only a comma", (){
       expect(() => parser.parse(',', String), throwsArgumentError);
+    });
+
+    test("does not allow non-string map keys", (){
+      expect(() => parser.parse('{hello:"world"}', SimpleFixture), throwsA(new isInstanceOf<LexerException>()));
+
+      Type type = new TypeToken<Map<int, String>>().type;
+      expect(() => parser.parse('{"1":"world"}', type), throwsArgumentError);
+    });
+
+    test("does not allow missing name separator", (){
+      expect(() => parser.parse('{hello "world"}', SimpleFixture), throwsA(new isInstanceOf<LexerException>()));
     });
   });
 }
