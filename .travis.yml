@@ -1,0 +1,8 @@
+language: dart
+dart:
+  - stable
+  - dev
+script: pub run test
+after_script:
+  - pub global activate dart_coveralls
+  - pub global run dart_coveralls report --token $REPO_TOKEN --retry 2 --exclude-test-files test/coverage.dart

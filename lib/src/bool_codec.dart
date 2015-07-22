@@ -1,4 +1,4 @@
-part of json_parser;
+part of easy_json;
 
 class BoolCodec extends Codec<bool, String> {
 

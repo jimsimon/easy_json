@@ -1,4 +1,4 @@
-name: json_parser
+name: easy_json
 description: A lexer for creating tokens from JSON.
 version: 1.0.0
 author: Jim Simon <jim.j.simon@gmail.com>
@@ -7,6 +7,14 @@ environment:
   sdk: '>=1.0.0 <2.0.0'
 dependencies:
   json_lexer: "^1.0.0"
+  reflectable:
+      git: git://github.com/dart-lang/reflectable.git
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
   http: any
+  dart_coveralls: any
+transformers:
+- reflectable:
+    entry_points:
+      - lib/reflectable_json.dart
+      - test/encoder_test.dart

@@ -1,8 +1,7 @@
-library json_parser.test;
+library easy_json.json_parser_test;
 
 import 'package:test/test.dart';
-
-import "package:json_parser/json_parser.dart";
+import "package:easy_json/easy_json.dart";
 
 main() async {
   JsonParser parser;

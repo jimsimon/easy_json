@@ -1,35 +1,11 @@
-library json_parser;
+part of easy_json;
 
-@MirrorsUsed(targets: const [int, double, bool, String, num, List, Map, Set, Object], metaTargets: const [_Serializable])
-import "dart:mirrors";
-import "dart:convert";
-import "dart:collection";
-
-import "package:json_lexer/json_lexer.dart";
-export "package:json_lexer/json_lexer.dart" show LexerException;
-
-part "src/int_codec.dart";
-part "src/double_codec.dart";
-part "src/bool_codec.dart";
-part "src/string_codec.dart";
-part "src/default_codec.dart";
-part "src/list_codec.dart";
-
-enum STATE {
+enum _STATE {
   INIT,
   FINISHED_VALUE,
   IN_OBJECT,
   IN_ARRAY,
   EOF
-}
-
-class _Serializable {
-  const _Serializable();
-}
-const Serializable = const _Serializable();
-
-class TypeToken<T> {
-  Type get type => reflectType(T).reflectedType;
 }
 
 class JsonParser {
@@ -59,7 +35,7 @@ class JsonParser {
   }
 
   parse(String json, Type t) {
-    STATE state = STATE.INIT;
+    _STATE state = _STATE.INIT;
 
     Queue<String> statusStack = new Queue();
     Queue valueStack = new Queue();
@@ -72,41 +48,41 @@ class JsonParser {
       Token token = tokens.removeFirst();
 
       switch(state) {
-        case STATE.INIT:
+        case _STATE.INIT:
           TypeMirror typeMirror = typeMirrorStack.first;
           switch(token.type) {
             case TokenType.VALUE:
-              state = STATE.FINISHED_VALUE;
+              state = _STATE.FINISHED_VALUE;
               var value = _convertTokenToType(token, typeMirror);
               valueStack.addFirst(value);
               break;
             case TokenType.BEGIN_OBJECT:
               var value = _convertTokenToType(token, typeMirror);
               valueStack.addFirst(value);
-              state = STATE.IN_OBJECT;
+              state = _STATE.IN_OBJECT;
               break;
             case TokenType.BEGIN_ARRAY:
               var value = _convertTokenToType(token, typeMirror);
               valueStack.addFirst(value);
-              state = STATE.IN_ARRAY;
+              state = _STATE.IN_ARRAY;
               break;
             default:
               _throwError(token);
           }
           break;
-        case STATE.FINISHED_VALUE:
+        case _STATE.FINISHED_VALUE:
           switch(token.type) {
             case TokenType.EOF:
-              state = STATE.EOF;
+              state = _STATE.EOF;
               break;
             default:
               _throwError(token);
           }
           break;
-        case STATE.IN_OBJECT:
+        case _STATE.IN_OBJECT:
           switch(token.type) {
             case TokenType.VALUE_SEPARATOR:
-              state = STATE.IN_OBJECT;
+              state = _STATE.IN_OBJECT;
               break;
             case TokenType.VALUE:
               tokens.removeFirst(); //Account for name-separator token
@@ -134,7 +110,7 @@ class JsonParser {
               if (valueToken.type == TokenType.BEGIN_ARRAY) {
                 typeMirrorStack.addFirst(valueTypeMirror);
                 valueStack.addFirst(value);
-                state = STATE.IN_ARRAY;
+                state = _STATE.IN_ARRAY;
               } else if (valueToken.type == TokenType.BEGIN_OBJECT) {
                 typeMirrorStack.addFirst(valueTypeMirror);
                 valueStack.addFirst(value);
@@ -144,32 +120,32 @@ class JsonParser {
               if(valueStack.length > 1) {
                 valueStack.removeFirst();
                 if (valueStack.first is Iterable) {
-                  state = STATE.IN_ARRAY;
+                  state = _STATE.IN_ARRAY;
                 }
               } else {
-                state = STATE.FINISHED_VALUE;
+                state = _STATE.FINISHED_VALUE;
               }
               break;
             default:
               _throwError(token);
           }
           break;
-        case STATE.IN_ARRAY:
+        case _STATE.IN_ARRAY:
           TypeMirror typeMirror = typeMirrorStack.first;
           switch(token.type) {
             case TokenType.VALUE_SEPARATOR:
-              state = STATE.IN_ARRAY;
+              state = _STATE.IN_ARRAY;
               break;
             case TokenType.VALUE:
               var value = _convertTokenToType(token, typeMirror.typeArguments.first);
               valueStack.first.add(value);
-              state = STATE.IN_ARRAY;
+              state = _STATE.IN_ARRAY;
               break;
             case TokenType.BEGIN_OBJECT:
               var value = _convertTokenToType(token, typeMirror.typeArguments.first);
               valueStack.first.add(value);
               valueStack.addFirst(value);
-              state = STATE.IN_OBJECT;
+              state = _STATE.IN_OBJECT;
               break;
             case TokenType.BEGIN_ARRAY:
               var value = _convertTokenToType(token, typeMirror.typeArguments.first);
@@ -182,10 +158,10 @@ class JsonParser {
                 valueStack.removeFirst();
                 typeMirrorStack.removeFirst();
                 if (valueStack.first is! Iterable) {
-                  state = STATE.IN_OBJECT;
+                  state = _STATE.IN_OBJECT;
                 }
               } else {
-                state = STATE.FINISHED_VALUE;
+                state = _STATE.FINISHED_VALUE;
               }
               break;
             default:
@@ -196,7 +172,7 @@ class JsonParser {
           _throwError(token);
           break;
       }
-      if (state == STATE.EOF) {
+      if (state == _STATE.EOF) {
         if (statusStack.isNotEmpty) {
           _throwError(token);
         }

@@ -1,4 +1,4 @@
-part of json_parser;
+part of easy_json;
 
 class DefaultCodec<T> extends Codec<T, String> {
 
