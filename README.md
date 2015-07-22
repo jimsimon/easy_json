@@ -6,9 +6,11 @@
 A serialization package for easily converting Dart objects to and from JSON.
  
 # Features
-* Written entirely in Dart
+* Written entirely in Dart (does not rely on Dart's JSON Codec)
 * Works on the VM only (dart2js support is in-progress)
 * Handles escaped JSON strings
+* Easy to extend with support for new types via codecs
+* Easy to override existing type codecs
 
 # Limitations
 * Dart classes must either have a no-args constructor, or a codec must be defined for that type.
@@ -56,3 +58,30 @@ main() {
   example = parser.parse(json, type);
 }
 ```
+
+# Adding Support for New Types via Codecs
+By default, this library comes with codecs for the following types:
+* bool
+* double
+* int
+* List
+* String
+
+These codecs are automatically preloaded when a JsonParser object is created.
+
+The purpose of a codec is to handle the serialization and deserialization of the type it's being registered for.  This means that the List codec should (and does) only create an empty list, and should not handle it's items as they will be handled by the codec for their Type.
+
+To add a new codec, implement the abstract Codec class provided by the dart:convert package, and then register it as follows:
+```dart
+import "package:easy_json/easy_json.dart";
+
+main() {
+  JsonParser parser = new JsonParser();
+  parser.addCodecForType(MyType, const MyTypeCodec());
+  parser.addCodecForSymbol(const Symbol("my.package.MyOtherType", const MyOtherTypeCodec());
+  
+  ...
+}
+```
+
+If the parser encounters a Type that does not have a Codec associated with it, it will attempt to use mirrors (reflection) to handle it.
