@@ -1,6 +1,6 @@
 part of easy_json;
 
-class JsonConsumer {
+class JsonComposer {
 
   bool _isPrimitive(value) {
     return value == null || value is num || value is bool;
@@ -65,7 +65,7 @@ class JsonConsumer {
     return map;
   }
 
-  String consume(input) {
+  String compose(input) {
     var jsonCodecCompatibleRepresentation = _translateToJsonCodecCompatibleRepresentation(input);
     return JSON.encode(jsonCodecCompatibleRepresentation);
   }

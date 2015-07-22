@@ -8,7 +8,7 @@ import "dart:collection";
 import "package:json_lexer/json_lexer.dart";
 export "package:json_lexer/json_lexer.dart" show LexerException;
 
-part "json_consumer.dart";
+part "json_composer.dart";
 part "json_parser.dart";
 part "type_token.dart";
 part "serializable.dart";

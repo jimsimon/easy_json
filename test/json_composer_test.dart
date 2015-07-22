@@ -1,99 +1,99 @@
 @TestOn("vm || browser")
-library easy_json.json_consumer_test;
+library easy_json.json_composer_test;
 
 import "package:test/test.dart";
 import "package:easy_json/easy_json.dart";
 
 main() {
-  JsonConsumer encoder = new JsonConsumer();
+  JsonComposer composer = new JsonComposer();
   group("Encoder", () {
     test("can encode null", () {
-      expect(encoder.consume(null), "null");
+      expect(composer.compose(null), "null");
     });
 
     test("can encode integers", () {
-      expect(encoder.consume(1), "1");
+      expect(composer.compose(1), "1");
     });
 
     test("can encode doubles", (){
-      expect(encoder.consume(2.0), "2");
+      expect(composer.compose(2.0), "2");
     });
 
     test("can encode strings", () {
-      expect(encoder.consume("hello world"), '"hello world"');
+      expect(composer.compose("hello world"), '"hello world"');
     });
 
     test("can encode booleans", () {
-      expect(encoder.consume(true), "true");
+      expect(composer.compose(true), "true");
     });
 
     test("can encode empty map literals", () {
-      expect(encoder.consume({}), "{}");
+      expect(composer.compose({}), "{}");
     });
 
     test("can encode empty map non-literals", () {
-      expect(encoder.consume(new Map()), "{}");
+      expect(composer.compose(new Map()), "{}");
     });
 
     test("can encode valid non-empty maps with String keys", (){
-      expect(encoder.consume({"1": "hello"}), '{"1":"hello"}');
+      expect(composer.compose({"1": "hello"}), '{"1":"hello"}');
     });
 
     test("can encode valid non-empty maps with int keys", (){
-      expect(encoder.consume({1: "hello"}), '{"1":"hello"}');
+      expect(composer.compose({1: "hello"}), '{"1":"hello"}');
     });
 
     test("can encode valid non-empty maps with double keys", (){
-      expect(encoder.consume({1.1: 1.1}), '{"1.1":1.1}');
+      expect(composer.compose({1.1: 1.1}), '{"1.1":1.1}');
     });
 
     test("can encode valid non-empty maps with boolean keys", (){
-      expect(encoder.consume({true: 1}), '{"true":1}');
+      expect(composer.compose({true: 1}), '{"true":1}');
     });
 
     test("can encode valid non-empty maps with mixed keys", (){
-      expect(encoder.consume({"1": "hello", 1.1: "hello", true: "hello"}), '{"1":"hello","1.1":"hello","true":"hello"}');
+      expect(composer.compose({"1": "hello", 1.1: "hello", true: "hello"}), '{"1":"hello","1.1":"hello","true":"hello"}');
     });
 
     test("can encode valid non-empty maps with duplicate keys of different types", (){
-      expect(encoder.consume({"1": "hello", 1: "hello"}), '{"1":"hello"}');
+      expect(composer.compose({"1": "hello", 1: "hello"}), '{"1":"hello"}');
     });
 
     test("throws error for complex keys", (){
-      expect(() => encoder.consume({{}: "hello"}), throwsArgumentError);
+      expect(() => composer.compose({{}: "hello"}), throwsArgumentError);
     });
 
     test("can encode empty list literals", () {
-      expect(encoder.consume([]), "[]");
+      expect(composer.compose([]), "[]");
     });
 
     test("can encode empty list objects", () {
-      expect(encoder.consume(new List()), "[]");
+      expect(composer.compose(new List()), "[]");
     });
 
     test("can encode list of Strings with single item", () {
-      expect(encoder.consume(["hello"]), '["hello"]');
+      expect(composer.compose(["hello"]), '["hello"]');
     });
 
     test("can encode list of Strings with mixed items", () {
-      expect(encoder.consume(["hello", 1]), '["hello",1]');
+      expect(composer.compose(["hello", 1]), '["hello",1]');
     });
 
     test("can encode an object with no properties", () {
-      expect(encoder.consume(new Object()), "{}");
+      expect(composer.compose(new Object()), "{}");
     }, skip: "Reflectable currently prevents serialization of root Object type");
 
     test("can encode an object with one property", () {
       var fixture = new SinglePropertyTestFixture();
       fixture.property1 = "hello";
-      expect(encoder.consume(fixture), '{"property1":"hello"}');
+      expect(composer.compose(fixture), '{"property1":"hello"}');
     });
 
     test("can encode an object with multiple properties", () {
       var fixture = new MultiplePropertyTestFixture();
       fixture.property1 = "hello";
       fixture.property2 = "world";
-      expect(encoder.consume(fixture), '{"property1":"hello","property2":"world"}');
+      expect(composer.compose(fixture), '{"property1":"hello","property2":"world"}');
     });
 
     test("can encode an object with complex properties", () {
@@ -103,7 +103,7 @@ main() {
       fixture.complex = new MultiplePropertyTestFixture();
       fixture.complex.property1 = "goodbye";
       fixture.complex.property2 = "friends";
-      expect(encoder.consume(fixture), '{"property1":"hello","property2":"world","complex":{"property1":"goodbye","property2":"friends"}}');
+      expect(composer.compose(fixture), '{"property1":"hello","property2":"world","complex":{"property1":"goodbye","property2":"friends"}}');
     });
 
     //TODO Add List and Map tests with complex objects in them
