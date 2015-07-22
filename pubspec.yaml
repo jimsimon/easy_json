@@ -11,8 +11,3 @@ dev_dependencies:
   test: '>=0.12.0 <0.13.0'
   http: any
   dart_coveralls: any
-transformers:
-- reflectable:
-    entry_points:
-      - lib/reflectable_json.dart
-      - test/encoder_test.dart
