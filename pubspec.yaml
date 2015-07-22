@@ -7,8 +7,6 @@ environment:
   sdk: '>=1.0.0 <2.0.0'
 dependencies:
   json_lexer: "^1.0.0"
-  reflectable:
-      git: git://github.com/dart-lang/reflectable.git
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
   http: any
