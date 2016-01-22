@@ -6,7 +6,6 @@ class JsonComposer {
     return value == null || value is num || value is bool;
   }
 
-  //TODO Use stack instead of recursion?
   _translateToJsonCodecCompatibleRepresentation(input) {
     if (_isPrimitive(input) || input is String) {
       //TODO Remove once https://code.google.com/p/dart/issues/detail?id=1533 (dart2js and spec disagree about numerics) is fixed
